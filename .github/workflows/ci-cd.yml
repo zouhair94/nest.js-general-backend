@@ -46,9 +46,12 @@ jobs:
           MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
         run: pnpm test
 
+      - name: check docker ps
+        run: docker
+
         #  Log in to Docker Hub
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.HEROKU_API_KEY }}" | docker login --username=_ --password-stdin registry.heroku.com
+        run: docker login --username=_ --password=${{ secrets.HEROKU_API_KEY }} registry.heroku.com
 
         #  Build the Docker image
       - name: Build Docker image
