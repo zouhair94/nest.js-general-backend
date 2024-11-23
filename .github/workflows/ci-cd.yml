@@ -44,6 +44,8 @@ jobs:
       - name: Run tests
         env:
           MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
         run: pnpm test
 
       # deploy in to heroku using heroku registry
@@ -51,9 +53,16 @@ jobs:
       - name: Log in to Docker Hub
         run: docker login --username=_ --password=${{ secrets.HEROKU_API_KEY }} registry.heroku.com
 
+        #  Stop the previous running container (if any) on Heroku
+      - name: Stop previous Heroku container
+        run: |
+          heroku ps:stop web --app ${{ secrets.HEROKU_APP_NAME }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
         #  Build the Docker image
       - name: Build Docker image
-        run: docker build --build-arg MONGODB_HOST_ARG=${{ secrets.MONGODB_HOST }} -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
+        run: docker build --build-arg MONGODB_HOST_ARG=${{ secrets.MONGODB_HOST }} JWT_SECRET_ARG=${{ secrets.JWT_SECRET }} JWT_EXPIRATION_ARG=${{ secrets.JWT_EXPIRATION }} -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
 
         #  Push the Docker image to Heroku
       - name: Push Docker image to Heroku

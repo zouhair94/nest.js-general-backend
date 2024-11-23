@@ -3,7 +3,12 @@ WORKDIR /app
 
 # Define build arguments
 ARG MONGODB_HOST_ARG=localhost
+ARG JWT_SECRET_ARG=localhost
+ARG JWT_EXPIRATION_ARG=localhost
+
 ENV MONGODB_HOST=$MONGODB_HOST_ARG
+ENV JWT_SECRET=$JWT_SECRET_ARG
+ENV JWT_EXPIRATION=$JWT_EXPIRATION_ARG
 
 # copy configs
 COPY package*.json ./
