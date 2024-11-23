@@ -1,35 +1,7 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
 ## Project setup
 
 ```bash
-$ pnpm install
+pnpm install
 ```
 
 ## Compile and run the project
@@ -60,40 +32,250 @@ $ pnpm run test:cov
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Documentation for CI/CD Workflow
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+This document explains the CI/CD pipeline implemented using GitHub Actions. The workflow automates building, testing, and deploying a Node.js application to Heroku using Docker.
 
-```bash
-$ pnpm install -g mau
-$ mau deploy
+#### Jobs
+
+1. Build
+
+```yaml
+    Runs On: ubuntu-latest
+    Steps:
+
+        Checkout Repository:
+        Checks out the repository code to the GitHub runner.
+
+        - uses: actions/checkout@v4
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Set Up Node.js:
+Sets up Node.js version 22.11 for the project.
 
-## Resources
+```yaml
+- name: Set up Node.js
+  uses: actions/setup-node@v3
+  with:
+    node-version: '22.11'
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Install pnpm:
+Installs the pnpm package manager globally.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```yaml
+- name: Install pnpm
+  run: npm install -g pnpm
+```
 
-## Support
+Install Dependencies:
+Installs project dependencies using pnpm.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```yaml
+- name: Install dependencies
+  run: pnpm install
+```
 
-## Stay in touch
+Build Project:
+Builds the application using pnpm.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```yaml
+- name: Build the project
+  run: pnpm run build
+```
 
-## License
+Run Tests:
+Executes tests while injecting sensitive environment variables as secrets.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```yaml
+        - name: Run tests
+          env:
+            MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
+            JWT_SECRET: ${{ secrets.JWT_SECRET }}
+            JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+          run: pnpm test
+```
+
+#### 2. Deploy
+
+This section handles deploying the application to Heroku using Docker.
+
+    Log in to Heroku Docker Registry:
+    Logs into the Heroku Docker registry using the HEROKU_API_KEY secret.
+
+```yaml
+- name: Log in to Docker Hub
+  run: docker login --username=_ --password=${{ secrets.HEROKU_API_KEY }} registry.heroku.com
+```
+
+Stop Previous Heroku Container:
+Stops the currently running container in the Heroku app (if any).
+
+```yaml
+- name: Stop previous Heroku container
+  run: |
+    heroku ps:stop web --app ${{ secrets.HEROKU_APP_NAME }}
+  env:
+    HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+```
+
+Build Docker Image:
+Builds a Docker image for the application, passing required secrets as build arguments.
+
+```yaml
+- name: Build Docker image
+  run: docker build --build-arg MONGODB_HOST_ARG=${{ secrets.MONGODB_HOST }} --build-arg JWT_SECRET_ARG=${{ secrets.JWT_SECRET }} --build-arg JWT_EXPIRATION_ARG=${{ secrets.JWT_EXPIRATION }} -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
+```
+
+Push Docker Image:
+Pushes the Docker image to Heroku's container registry.
+
+```yaml
+- name: Push Docker image to Heroku
+  run: docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+```
+
+Set Heroku Stack to Container:
+Ensures the Heroku app's stack is configured for container deployment.
+
+```yaml
+- name: Set Heroku stack to container
+  run: heroku stack:set container --app ${{ secrets.HEROKU_APP_NAME }}
+  env:
+    HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+```
+
+Release on Heroku:
+Releases the newly pushed Docker image to Heroku.
+
+```yaml
+    - name: Release on Heroku
+      run: |
+        heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+```
+
+Secrets
+
+The following secrets are required for the pipeline:
+
+```yaml
+    MONGODB_HOST: MongoDB host URI.
+    JWT_SECRET: Secret key for JWT authentication.
+    JWT_EXPIRATION: JWT expiration time.
+    HEROKU_API_KEY: Heroku API key for authentication.
+    HEROKU_APP_NAME: Name of the Heroku app for deployment.
+```
+
+Key Points
+
+    Node.js Version: The pipeline uses Node.js version 22.11.
+    Build Tool: The project is built using pnpm.
+    Testing: Secrets are securely passed as environment variables during test execution.
+    Deployment: The application is containerized with Docker and deployed to Heroku.
+    Manual Execution: The workflow can be triggered manually for flexibility.
+
+Usage
+
+    Push changes or open a pull request on the main branch to trigger the pipeline.
+    View pipeline results in the GitHub Actions tab.
+    Ensure required secrets are set in the repository's settings under Secrets and variables > Actions.
+
+## Bash script
+
+This bash script automates the process of building a Docker image for a Node.js application, stopping any existing containers, and running the new Docker container with the necessary configurations.
+Purpose
+
+The script builds a Docker image for the application, stops and removes any previously running container, and starts a new container from the freshly built image. It also passes sensitive environment variables (MongoDB host, JWT secret, and expiration) during the build process
+
+Script Breakdown
+
+```bash
+    Set Error Handling (set -e)
+```
+
+The script begins by enabling strict error handling. If any command fails, the script will stop execution immediately, ensuring that errors are caught early.
+
+```bash
+set -e
+```
+
+Build Docker Image
+
+The script builds a Docker image using the docker build command. It uses the following build arguments:
+
+```bash
+MONGODB_HOST_ARG: "The MongoDB host URL".
+JWT_SECRET_ARG: "The JWT secret key".
+JWT_EXPIRATION_ARG: "The JWT expiration time".
+```
+
+The image is tagged with <b>assessment</b>: A local tag for running the container.
+
+```bash
+docker build --build-arg MONGODB_HOST_ARG=$MONGODB_HOST JWT_SECRET_ARG=$JWT_SECRET --build-arg JWT_EXPIRATION_ARG=$JWT_EXPIRATION -t registry.heroku.com/$HEROKU_APP_NAME -t assessment .
+```
+
+Stop and Remove Existing Containers
+
+Before running a new container, the script ensures that any existing container with the name assessment is stopped and removed. This step prevents potential conflicts with containers from previous runs.
+
+```bash
+docker stop assessment || true
+docker rm assessment || true
+```
+
+Run Docker Container
+
+Finally, the script runs a new Docker container from the image built earlier. The container is named assessment, and it is run in detached mode (-d) with the following port mappings:
+
+```bash
+    docker run -d --name assessment -p 3000:3000 assessment
+```
+
+Environment Variables
+
+The script expects the following environment variables to be set before execution:
+
+```bash
+    MONGODB_HOST: "MongoDB host URL used for database connection".
+    JWT_SECRET: "The secret key used for signing(JWT)".
+    JWT_EXPIRATION: "The expiration time for the JWTs".
+    HEROKU_APP_NAME: "The name of the Heroku app".
+```
+
+#### Usage
+
+Set Environment Variables: Ensure the environment variables are set before running the script:
+
+```bash
+export MONGODB_HOST="your_mongodb_host"
+export JWT_SECRET="your_jwt_secret"
+export JWT_EXPIRATION="1h"
+export HEROKU_APP_NAME="your_heroku_app_name"
+```
+
+Run the Script: Execute the script from the terminal:
+
+Make it executable:
+```bash
+chmod +x run.sh
+```
+then run
+```bash
+    ./run.sh
+```
+
+Access the Application: After the container is up and running, the application will be accessible at <http://localhost:3000> on your machine.
+
+## Notes
+
+the file structure of the project splits into normal nest app and a core-library which contains the config of Db, the abstract classes the repository pattern and the Models.
+
+the link after deployment is <https://assesement-3d345674d453.herokuapp.com>
+
+### Swagger
+
+In order to make it easy to be reached and more documented, I had added a swagger description of the app in which the user will be able to deal with all the endpoints.
+ can be found here <https://assesement-3d345674d453.herokuapp.com/api>

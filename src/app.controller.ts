@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
 import { LocalAuthGuard } from './auth/local-auth/local-auth.guard';
-import { JwtAuthGuard } from './auth/jwt-auth/jwt-auth.guard';
 import { LoginDto } from './login.dto';
 import { ApiResponse } from '@nestjs/swagger';
 
@@ -13,7 +12,6 @@ export class AppController {
     private readonly authService: AuthService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   getHello(): string {
     return this.appService.getHello();
