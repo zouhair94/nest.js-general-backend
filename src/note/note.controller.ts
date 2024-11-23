@@ -44,10 +44,9 @@ export class NoteController {
     description: 'List all notes.',
     content: {
       'application/json': {
-        // Specify the content type
         schema: {
-          type: 'array', // The response is an array
-          items: { $ref: getSchemaPath(CreateNoteDto) }, // Reference to the NoteDocument schema
+          type: 'array',
+          items: { $ref: getSchemaPath(CreateNoteDto) },
         },
       },
     },
