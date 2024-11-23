@@ -1,34 +1,49 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { NoteService } from './note.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 
 @Controller('note')
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createNoteDto: CreateNoteDto) {
-    return this.noteService.create(createNoteDto);
+  async create(@Body() createNoteDto: CreateNoteDto, @Request() req) {
+    createNoteDto.owner = req.user.userId;
+    return await this.noteService.create(createNoteDto);
   }
 
   @Get()
-  findAll() {
-    return this.noteService.findAll();
+  async findAll() {
+    return await this.noteService.findAll();
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.noteService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.noteService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto) {
-    return this.noteService.update(+id, updateNoteDto);
+  async update(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto) {
+    return await this.noteService.update(id, updateNoteDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.noteService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.noteService.remove(id);
   }
 }

@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { NoteRepository } from './note.repository';
 
 @Injectable()
 export class NoteService {
-  create(createNoteDto: CreateNoteDto) {
-    return 'This action adds a new note';
+  constructor(private readonly noteRepository: NoteRepository) {}
+
+  async create(createNoteDto: CreateNoteDto) {
+    return await this.noteRepository.create(createNoteDto);
   }
 
-  findAll() {
-    return `This action returns all note`;
+  async findAll() {
+    return await this.noteRepository.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} note`;
+  async findOne(id: string) {
+    if (!id) {
+      throw new BadRequestException('ID must be defined!');
+    }
+    return await this.noteRepository.findOne({ _id: id });
   }
 
-  update(id: number, updateNoteDto: UpdateNoteDto) {
-    return `This action updates a #${id} note`;
+  async update(id: string, updateNoteDto: UpdateNoteDto) {
+    if (!id || !updateNoteDto) {
+      throw new BadRequestException('ID and data must be defined!');
+    }
+    return await this.noteRepository.findOneAndUpdate(
+      { _id: id },
+      updateNoteDto,
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} note`;
+  async remove(id: string) {
+    if (!id) {
+      throw new BadRequestException('ID must be defined!');
+    }
+    return await this.noteRepository.findOneAndDelete({ _id: id });
   }
 }
