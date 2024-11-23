@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: CI/CD
 
 # Controls when the workflow will run
 on:
@@ -46,10 +46,8 @@ jobs:
           MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
         run: pnpm test
 
-      - name: check docker ps
-        run: docker
-
-        #  Log in to Docker Hub
+      # deploy in to heroku using heroku registry
+      #  Log in to Docker Hub
       - name: Log in to Docker Hub
         run: docker login --username=_ --password=${{ secrets.HEROKU_API_KEY }} registry.heroku.com
 
