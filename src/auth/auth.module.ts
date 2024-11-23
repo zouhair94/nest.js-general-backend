@@ -11,6 +11,7 @@ import { LocalStrategy } from './strategies/local.strategy';
   imports: [
     UserModule,
     ConfigModule.forRoot({
+      isGlobal: true,
       validationSchema: joi.object({
         JWT_SECRET: joi.string().required(),
         JWT_EXPIRATION: joi.string().required(),
