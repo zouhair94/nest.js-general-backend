@@ -1,26 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRepository } from './user.repository';
+
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly userRepository: UserRepository) {}
+
+  async create(createUserDto: CreateUserDto) {
+    const verify = await this.userRepository.findOne({
+      $or: [
+        { username: createUserDto.username },
+        { email: createUserDto.email },
+      ],
+    });
+
+    if (verify) {
+      throw new UnauthorizedException('This user already exists!');
+    }
+    return await this.userRepository.create({
+      ...createUserDto,
+      password: await bcrypt.hash(createUserDto.password, 12),
+    });
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(filters = {}) {
+    return await this.userRepository.find(filters);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findOne(filters = {}, select: string = null) {
+    return await this.userRepository.findOne(filters, select);
   }
 }
