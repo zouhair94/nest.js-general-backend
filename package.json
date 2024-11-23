@@ -75,7 +75,7 @@
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s",
-      "!*/main.ts",
+      "!**/main.ts",
       "!**/*.module.ts",
       "!**/*.repository.ts",
       "!**/*.dto.ts",
