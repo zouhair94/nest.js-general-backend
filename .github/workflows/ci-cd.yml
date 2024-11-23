@@ -38,10 +38,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build the project
+        run: pnpm run build
+
       - name: Run tests
         env:
           MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
         run: pnpm test
-
-      - name: build the project
-        run: pnpm build
