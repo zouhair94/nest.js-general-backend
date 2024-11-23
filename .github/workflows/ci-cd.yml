@@ -62,7 +62,7 @@ jobs:
 
         #  Build the Docker image
       - name: Build Docker image
-        run: docker build --build-arg MONGODB_HOST_ARG=${{ secrets.MONGODB_HOST }} JWT_SECRET_ARG=${{ secrets.JWT_SECRET }} JWT_EXPIRATION_ARG=${{ secrets.JWT_EXPIRATION }} -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
+        run: docker build --build-arg MONGODB_HOST_ARG=${{ secrets.MONGODB_HOST }} --build-arg JWT_SECRET_ARG=${{ secrets.JWT_SECRET }} --build-arg JWT_EXPIRATION_ARG=${{ secrets.JWT_EXPIRATION }} -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
 
         #  Push the Docker image to Heroku
       - name: Push Docker image to Heroku
