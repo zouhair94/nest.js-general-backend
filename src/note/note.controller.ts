@@ -21,9 +21,10 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { NoteAuthorizationGuard } from '../auth/authorization/authorization.guard';
 
 @ApiBearerAuth()
-@Controller('note')
+@Controller('notes')
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
@@ -65,7 +66,7 @@ export class NoteController {
     return await this.noteService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, NoteAuthorizationGuard)
   @Patch(':id')
   @ApiOkResponse({
     description: 'returns the updated note.',
@@ -76,7 +77,7 @@ export class NoteController {
     return await this.noteService.update(id, updateNoteDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, NoteAuthorizationGuard)
   @Delete(':id')
   @ApiOkResponse({
     description: 'returns the removed note.',

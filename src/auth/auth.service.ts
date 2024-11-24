@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
@@ -26,7 +26,10 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { username: user.username, sub: user._id };
+    if (!user) {
+      throw new BadRequestException('user not found');
+    }
+    const payload = { username: user.username, sub: user._id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
     };
