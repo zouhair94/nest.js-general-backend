@@ -269,13 +269,3 @@ then run
 
 Access the Application: After the container is up and running, the application will be accessible at <http://localhost:3000> on your machine.
 
-## Notes
-
-the file structure of the project splits into normal nest app and a core-library which contains the config of Db, the abstract classes the repository pattern and the Models.
-
-the link after deployment is <https://assesement-3d345674d453.herokuapp.com>
-
-### Swagger
-
-In order to make it easy to be reached and more documented, I had added a swagger description of the app in which the user will be able to deal with all the endpoints.
- can be found here <https://assesement-3d345674d453.herokuapp.com/api>
